@@ -1,65 +1,84 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+
+export default function HomePage() {
+  const [ticker, setTicker] = useState("CTM");
+  const [daysBack, setDaysBack] = useState(365);
+
+  const downloadZip = () => {
+    const t = ticker.trim().toUpperCase();
+    if (!t) return;
+    const url = `/api/pack?ticker=${encodeURIComponent(
+      t
+    )}&daysBack=${daysBack}`;
+    window.location.href = url; // triggers file download
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main style={{ maxWidth: 720, margin: "40px auto", padding: 16 }}>
+      <h1 style={{ fontSize: 28, fontWeight: 700 }}>
+        SEC EDGAR Filing Packager
+      </h1>
+      <p style={{ marginTop: 8, opacity: 0.8 }}>
+        Downloads key filings for a ticker and bundles them into a ZIP.
+      </p>
+
+      <div style={{ marginTop: 24, display: "grid", gap: 12 }}>
+        <label style={{ display: "grid", gap: 6 }}>
+          <span style={{ fontWeight: 600 }}>Ticker</span>
+          <input
+            value={ticker}
+            onChange={(e) => setTicker(e.target.value)}
+            placeholder="CTM"
+            style={{ padding: 10, borderRadius: 8, border: "1px solid #ccc" }}
+          />
+        </label>
+
+        <label style={{ display: "grid", gap: 6 }}>
+          <span style={{ fontWeight: 600 }}>Days back for 8-K + Form 4</span>
+          <input
+            type="number"
+            value={daysBack}
+            onChange={(e) => setDaysBack(Number(e.target.value))}
+            min={30}
+            max={730}
+            style={{ padding: 10, borderRadius: 8, border: "1px solid #ccc" }}
+          />
+          <small style={{ opacity: 0.75 }}>
+            Default 365 (roughly last 12 months).
+          </small>
+        </label>
+
+        <button
+          onClick={downloadZip}
+          style={{
+            padding: "12px 14px",
+            borderRadius: 10,
+            border: "1px solid #111",
+            background: "#111",
+            color: "#fff",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Download ZIP
+        </button>
+
+        <div style={{ marginTop: 16, opacity: 0.85 }}>
+          <div style={{ fontWeight: 700, marginBottom: 6 }}>
+            Included automatically:
+          </div>
+          <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.7 }}>
+            <li>Latest 10-K</li>
+            <li>Latest two 10-Q</li>
+            <li>8-K filings within days-back window</li>
+            <li>Latest S-3 / S-3/A</li>
+            <li>Latest DEF 14A</li>
+            <li>Form 4 filings within days-back window</li>
+          </ul>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
